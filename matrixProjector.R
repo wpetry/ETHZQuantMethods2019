@@ -18,7 +18,7 @@ VEC<-matrix(c(n,0,0,0,0,0),ncol=1,dimnames=list(paste0("c",1:6),"n"))
 
 # User-interface definition for Matrix Population Model app
 # Define UI for application that draws a histogram
-shinyUI(fluidPage(
+ui <- shinyUI(fluidPage(
   
   # Application title
   titlePanel("Modeling structure populations"),
@@ -66,7 +66,7 @@ shinyUI(fluidPage(
 
 # Server logic for Matrix Population Model app
 # Define server logic to take user input matrix model and project population dynamics
-shinyServer(function(input, output) {
+server <- shinyServer(function(input, output) {
   
   values <- reactiveValues()  # is this doing anything?
   
