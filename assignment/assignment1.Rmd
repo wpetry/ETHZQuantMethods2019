@@ -1,0 +1,121 @@
+---
+title: 'Stage structure module assignment 1: Stochastic algae'
+output:
+  pdf_document: default
+  word_document: default
+date: "Spring Semester 2019"
+subtitle: Quantitative Methods in Ecology
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load("goteborg.RData")
+load("tjarno.RData")
+load("seaice.RData")
+```
+
+With this assignment, you will be asked to demonstrate your understanding of stage-structured population models in both *constant* and *stochastic* environments. This assignment will be the basis of your mark for 50% of the stage structure module. You are welcome to work collaboratively, but each student needs to submit their own assignment.
+
+**Due date:** 20 March 2019 by 23:59
+
+**Email to:** william.petry@usys.ethz.ch
+
+**Format:** .pdf, .Rmd, .docx are all ok. Please ask me if you want to use something else.
+
+You may run the analyses on your own computer or on the RStudio Cloud that I've set up for this module (https://rstudio.cloud/spaces/12144/project/239821).
+
+## Natural history
+*Ascophyllum nodosum* is a perennial, iteroparous (=reproduces multiple times during its lifecycle), non-clonal brown alga. It grows on rocky sea coasts of the northern Atlantic Ocean and is commercially harvested for alginate (used as a thickener in a wide range of foods, cosmetics, & medicines). During winter the algae are exposed to sea ice. The ice tears off parts of the individual, reducing its size. The entire alga can be killed by ice damage.
+
+## Dataset
+We'll use demographic data from:
+
+> Åberg, P. (1992) A demographic study of two populations of the seaweed *Ascophyllum nodosum*. Ecology 75:1473–1487. [DOI: 10.2307/1940691](http://dx.doi.org/10.2307/1940691).
+
+### Demographic model
+The demograpic data come from two populations in Sweden, Göteborg and Tjärnö. Like many studied populations, these happen to be located near a university and a biological research station, respectively. At both populations, size-specific demographic rates were estimated from field data on tagged individuals. Individuals were classified into five size stages based on their dry biomass, A1: 0 -- <5 g, A2: 5 -- <15 g, A3: 15 -- <54 g, A4: 54 -- <190 g, and A5: $\geq$ 190 g. All transition probabilities at both populatons were measured in a “mild,” “normal,” and “severe” sea ice year.
+
+### Environmental model
+The Swedish Meterological & Hydrological Institute (https://www.smhi.se/en) has maintained data on sea ice conditions for the winters beginning in 1899--2017. I've combined multiple datasets, focusing on unifying the data into a single timeseries. We'll assume that the broad classification of the sea ice conditions apply to both algae populations.
+
+## Loading & working with the data
+All of the data is provided in .Rdata format. In RStudio, navigate to where you have the file saved on your computer in the 'Files' pane. Click on each .RData file and confirm that you want to load it into your workspace. Alternatively, use the `load()` function by substituting in the filepath and file name that you want to load:
+```{r, eval=F}
+load(file = "path/to/saved/file/FILENAME.RData")
+```
+
+`goteborg.Rdata` & `tjarno.Rdata` contain the transition matrices as a list--each matrix is named based on the sea ice enviornment. You can also extract individual transition matrices by using the `$` followed by the sea ice environment ("mild", "normal", "severe"). For example, one could calculate the column sums of the transition matrix in an "severe" ice year at Tjärnö as:
+```{r}
+load("tjarno.RData")
+colSums(tjarno$severe)
+```
+Because these are lists, one can also apply the same function to each transition matrix in the list (e.g., calculating the column sums for each sea ice environment at Tjärnö) as:
+```{r}
+lapply(tjarno, colSums)
+```
+
+`seaice.RData` will load as a data frame with a column for the "year" the winter began and a column classifying the sea "ice" enviornment. Here's a glimpse at the first few rows:
+```{r}
+load("seaice.RData")
+head(seaice)
+```
+
+I recommend you use the functions in the package `popdemo`, which can do both constant & stochastic population analyses. You'll also need functions in `markovchain`. Both are already installed on the RStudio Cloud instance. You can install them on your computer with:
+```{r, eval=F}
+install.packages("popdemo")
+install.packages("markovchain")
+```
+
+## Part I: Constant environment
+1. Assume that the environment does not change. Calculate the equilibrium per-capita population growth rate ($\lambda$) for both populations under the 3 different sea ice environments.
+
+| Population | Ice environment | Constant environemtnt $\lambda$ |
+|------------|-----------------|-----------|
+| Göteborg   | Mild            |           |
+| Göteborg   | Normal          |           |
+| Göteborg   | Severe          |           |
+| Tjärnö     | Mild            |           |
+| Tjärnö     | Normal          |           |
+| Tjärnö     | Severe          |           |
+
+2. Select a population & environmental condition of your choice.
+(a) Please name which population/environment combination you selected.
+
+> Population:
+
+> Sea ice environment:
+
+(b) Which transition probability would have the biggest impact on $\lambda$ if it were to be perturbed by a small, fixed amount (i.e., which matrix element has the highest *sensitivity*)?
+
+
+(c) What does this transition probability mean biologically? That is, does the rate measure growth, survival, reproduction, or some combination of these demographic processes? Which sizes of algae are involved in this transition?
+
+
+## Part II: Stochastic environment
+3. Sea ice timeseries analysis.
+(a) Construct a 3x3 matrix that represents an iid environmental model of sea ice transitions.
+
+(b) What is the stochastic per-capita population growth rate ($\lambda_s$) for the **Tjärnö** population using the iid environment model you constructed in part (a)?
+
+(c) In the 119 year timeseries of sea ice conditions, what is the overall proportion of years in each environmental condition, rounded to the nearest 0.01? Which environmental state is more frequent in the observed sea ice data compared to your iid model in part (a)?
+
+
+4. Sea ice autocorrelation.
+(a) Use the following code to estimate the sea ice environmental transition probabilities from one year to the next. What does the autocorrelation estimate mean in terms of how often the environment changes from year to year?
+```{r, include=T, message=F}
+library(markovchain)
+env_model <- t(markovchainFit(seaice$ice)[["estimate"]]@transitionMatrix)
+env_model  # environment transition matrix
+
+acf(env_model, plot = FALSE)$acf[2]  # autocorrelation of environment
+```
+
+(b) The environment model transition matrix is stored in `env_model`. What is the stochastic per-capita population growth rate ($\lambda_s$) for the **Tjärnö** population using this autocorrelated environment model? [Hint: set the projection function options to `iterations = 1000` and `discard = 100` to numbers that are too small/large for your computer to handle]
+
+
+## Part III: Climate change projection
+5. With climate change, sea ice is expected to decrease.
+(a) Do you expect climate change will have a positive or negative impact on the stochastic per-capita population growth rate ($\lambda_s$) of this alga in the **Tjärnö** population?
+
+
+(b) Please provide a 3x3 transition matrix that could be used to project stochastic population dynamics under climate change. [Exact numbers here don't matter, I just want to see your thinking.]

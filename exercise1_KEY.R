@@ -81,4 +81,4 @@ stable.stage(teasel) * 100
 
 # notice that the starting population is close to the equalibrium
 # stage structure
-pop15/sum(pop15)
+pop15/sum(pop15) * 100

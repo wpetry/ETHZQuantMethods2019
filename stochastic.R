@@ -43,7 +43,7 @@ n_0 <- c(100, 100)
 
 # Generate a sequence of environments using a coin (tails = t, heads = h)
 
-# [HERE]
+A_h %*% (A_t %*% (A_h %*% n_0))
 
 
 
