@@ -39,7 +39,7 @@ A_t <- matrix(c(0.1, 3.0,
 A_h <- matrix(c(0.2, 0.2,
                 1.0, 0),
               nrow = 2, byrow = TRUE)
-n_0 <- c(1e6, 1e6)
+n_0 <- c(100, 100)
 
 # Generate a sequence of environments using a coin (tails = t, heads = h)
 
@@ -49,6 +49,7 @@ n_0 <- c(1e6, 1e6)
 
 
 # What is the long-term stochastic population growth rate?
+n_0 <- c(1e6, 1e6)
 A_list <- list(t = A_t, h = A_h)
 E_iid <- matrix(0.5, nrow = 2, ncol = 2,
                 dimnames = list(c("t", "h"),
