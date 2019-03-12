@@ -8,7 +8,7 @@ library(popdemo)
 
 acor <- function(P){
   if(!all.equal(dim(P), c(2, 2))) stop("Autocorrelation function invalid for matrices larger than 2x2")
-  if(!all(E[,1] == rev(E[,2]))) stop("Autocorrelation function invalid for asymmetric matrices")
+  if(!all(P[,1] == rev(P[,2]))) stop("Autocorrelation function invalid for asymmetric matrices")
   2 * P[1, 1] - 1
 }
 
